@@ -1,0 +1,29 @@
+version: '3'
+services:
+  server:
+    image: node:latest
+    working_dir: /code
+    ports: 
+      - 3000:3000
+    environment: 
+      - DB_NAME=toms_db
+      - DB_CONNECTION=mongodb://tom:password@db:27017
+    depends_on:
+      - db
+    volumes:
+      - type: bind
+        source: ./api
+        target: /code
+    command: bash -c "npm install && npm run dev"
+
+  db:
+    image: mongo:latest
+    volumes:
+      - "dbdata:/var/lib/mongodb/data"
+      - "./db/seeds.js:/docker-entrypoint-initdb.d/seeds.js:ro"
+    environment: 
+      - MONGO_INITDB_ROOT_USERNAME=tom
+      - MONGO_INITDB_DATABASE=toms_db
+      - MONGO_INITDB_ROOT_PASSWORD=password
+volumes:
+  dbdata:
